@@ -1,8 +1,36 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:safecrypt/screens/main_home_screen.dart';
+import 'package:safecrypt/screens/sign_in_screen.dart'; // Import login screen
+import 'package:safecrypt/screens/create_vault_screen.dart'; // Import sign-up screen
 import 'package:safecrypt/colors/colors.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    // Firebase initialization
+    if (kIsWeb) {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: "AIzaSyCNVwMBhHKtBCHz5buAUoJsU--zTzx_HnE",
+          authDomain: "safecrypt-x9.firebaseapp.com",
+          projectId: "safecrypt-x9",
+          storageBucket: "safecrypt-x9.firebasestorage.app",
+          messagingSenderId: "427635113344",
+          appId: "1:427635113344:web:c35c6b60c485daa80f9565",
+          measurementId: "G-6MWK222Q4W",
+        ),
+      );
+    } else {
+      await Firebase.initializeApp();
+    }
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
+
   runApp(MyApp());
 }
 
@@ -26,22 +54,60 @@ class LetsGetStartedScreen extends StatefulWidget {
   _LetsGetStartedScreenState createState() => _LetsGetStartedScreenState();
 }
 
-class _LetsGetStartedScreenState extends State<LetsGetStartedScreen> with SingleTickerProviderStateMixin {
+class _LetsGetStartedScreenState extends State<LetsGetStartedScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _animation;
+  User? user;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
 
     _animation = Tween<Offset>(
-      begin: Offset(0.0, 0.1),
-      end: Offset(0.0, -0.1),
+      begin: const Offset(0.0, 0.1),
+      end: const Offset(0.0, -0.1),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    // Check if the user is already logged in
+    checkUserStatus();
+  }
+
+  // Check user authentication status
+  Future<void> checkUserStatus() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? currentUser = auth.currentUser;
+
+    setState(() {
+      user = currentUser;
+    });
+
+    if (user != null) {
+      // If the user is logged in, navigate to the main screen
+      if (user!.email == "administrator@example.com") {
+        // Admin specific flow
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainHomeScreen()), // Admin Dashboard
+        );
+      } else {
+        // Normal user flow
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainHomeScreen()), // User Dashboard
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,48 +116,46 @@ class _LetsGetStartedScreenState extends State<LetsGetStartedScreen> with Single
       body: Stack(
         children: [
           // Background Wave Animation
-          Positioned.fill(
+          const Positioned.fill(
             child: WaveAnimation(),
           ),
           // Content
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // App Name with Secure Icon
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.security,  // Secure Icon (Shield)
+                    const Icon(
+                      Icons.security,
                       size: 40,
                       color: Colors.white,
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text(
                       'SafeCrypt',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 // Icon in the center
                 SlideTransition(
                   position: _animation,
-                  child: Icon(
+                  child: const Icon(
                     Icons.security,
                     size: 120,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 // Slogan Text
-                Text(
+                const Text(
                   'Your Secure Vault for Passwords and More',
                   style: TextStyle(
                     fontSize: 18,
@@ -99,16 +163,16 @@ class _LetsGetStartedScreenState extends State<LetsGetStartedScreen> with Single
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 // Divider line
-                Divider(
+                const Divider(
                   color: Colors.white,
                   thickness: 1.5,
                   indent: 40,
                   endIndent: 40,
                 ),
-                SizedBox(height: 30),
-                Text(
+                const SizedBox(height: 30),
+                const Text(
                   'Let\'s Get Started',
                   style: TextStyle(
                     fontSize: 24,
@@ -116,15 +180,23 @@ class _LetsGetStartedScreenState extends State<LetsGetStartedScreen> with Single
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 // Button to move to the main screen
                 AnimatedButton(
                   text: 'Get Started',
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainHomeScreen()),
-                    );
+                    // Navigate to login or sign-up page based on user status
+                    if (user == null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignInScreen()),
+                      );
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => MainHomeScreen()),
+                      );
+                    }
                   },
                   color: AppColors.secondary,
                 ),
@@ -135,21 +207,17 @@ class _LetsGetStartedScreenState extends State<LetsGetStartedScreen> with Single
       ),
     );
   }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 }
 
-// Wave Animation Widget
 class WaveAnimation extends StatefulWidget {
+  const WaveAnimation({Key? key}) : super(key: key);
+
   @override
   _WaveAnimationState createState() => _WaveAnimationState();
 }
 
-class _WaveAnimationState extends State<WaveAnimation> with SingleTickerProviderStateMixin {
+class _WaveAnimationState extends State<WaveAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _waveController;
   late Animation<double> _waveAnimation;
 
@@ -157,11 +225,19 @@ class _WaveAnimationState extends State<WaveAnimation> with SingleTickerProvider
   void initState() {
     super.initState();
     _waveController = AnimationController(
-      duration: Duration(seconds: 5),
+      duration: const Duration(seconds: 5),
       vsync: this,
     )..repeat(reverse: true);
 
-    _waveAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _waveController, curve: Curves.easeInOut));
+    _waveAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _waveController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _waveController.dispose();
+    super.dispose();
   }
 
   @override
@@ -184,31 +260,25 @@ class _WaveAnimationState extends State<WaveAnimation> with SingleTickerProvider
       },
     );
   }
-
-  @override
-  void dispose() {
-    _waveController.dispose();
-    super.dispose();
-  }
 }
 
-// Wave Painter
 class WavePainter extends CustomPainter {
   final double progress;
+
   WavePainter({required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
+    final paint = Paint()
       ..color = Colors.white.withOpacity(0.3)
       ..style = PaintingStyle.fill;
 
-    Path path = Path();
+    final path = Path();
 
-    // Create wave-like effect
     path.lineTo(0, size.height - 100 * progress);
     for (double i = 0; i < size.width; i++) {
-      path.lineTo(i, size.height - 100 * progress + (10 * (i / size.width) * (i / size.width)));
+      path.lineTo(i, size.height - 100 * progress +
+          (10 * (i / size.width) * (i / size.width)));
     }
     path.lineTo(size.width, size.height - 100 * progress);
     path.close();
@@ -222,7 +292,6 @@ class WavePainter extends CustomPainter {
   }
 }
 
-// Animated Button Widget
 class AnimatedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -239,7 +308,7 @@ class AnimatedButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: color,
@@ -257,7 +326,7 @@ class AnimatedButton extends StatelessWidget {
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               color: Colors.white,
               fontWeight: FontWeight.bold,
