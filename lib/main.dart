@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:safecrypt/screens/main_home_screen.dart';
 import 'package:safecrypt/screens/sign_in_screen.dart'; // Import login screen
-import 'package:safecrypt/screens/create_vault_screen.dart'; // Import sign-up screen
+// Import sign-up screen
 import 'package:safecrypt/colors/colors.dart';
 
 void main() async {
@@ -270,7 +270,7 @@ class WavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white
       ..style = PaintingStyle.fill;
 
     final path = Path();

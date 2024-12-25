@@ -224,14 +224,14 @@ class _ScaleAnimationButtonState extends State<ScaleAnimationButton> with Single
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [widget.color.withOpacity(0.8), widget.color],
+              colors: [widget.color, widget.color],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(0.4),
+                color: widget.color,
                 spreadRadius: 3,
                 blurRadius: 10,
               ),
@@ -309,7 +309,7 @@ class WaveLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blueAccent.withOpacity(0.2)
+      ..color = Colors.blueAccent
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
