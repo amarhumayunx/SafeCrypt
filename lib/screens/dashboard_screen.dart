@@ -1,126 +1,278 @@
 import 'package:flutter/material.dart';
-import 'package:safecrypt/colors/colors.dart'; // Custom colors
-import 'package:safecrypt/screens/create_vault_screen.dart'; // Adjust path if needed
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:safecrypt/password_model.dart';
+import 'package:safecrypt/constants.dart';
+import 'package:safecrypt/category_container.dart';
+import '../add_model.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Dashboard',
-          style: TextStyle(color: Colors.white),
+    const String assetName = 'assets/images/bell.svg';
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => bottomModal(context),
+          backgroundColor: Constants.fabBackground,
+          child: Icon(Icons.add),
         ),
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.secondary],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 10,
+          child: SizedBox(
+            height: 60,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SvgPicture.asset("assets/images/4square.svg"),
+                SizedBox(width: 10),
+                SvgPicture.asset("assets/images/shield.svg"),
+              ],
+            ),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Welcome to SafeCrypt',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                profilePicAndBellIcon(assetName, screenHeight),
+                SizedBox(height: 20),
+                searchText("Search Password"),
+                SizedBox(height: 10),
+                HeadingText("Category"),
+                SizedBox(height: 10),
+                CategoryBoxes(),
+                SizedBox(height: 10),
+                HeadingText("Recently Used"),
+                SizedBox(height: 10),
+                Container(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: Constants.passwordData.length,
+                    itemBuilder: (context, index) {
+                      final password = Constants.passwordData[index];
+                      return PasswordTile(password, context);
+                    },
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                children: [
-                  _dashboardCard(
-                    icon: Icons.lock,
-                    title: 'Create Vault',
-                    color: Colors.blueAccent,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreateVaultScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _dashboardCard(
-                    icon: Icons.vpn_key,
-                    title: 'Manage Vaults',
-                    color: Colors.green,
-                    onTap: () {
-                      // Add navigation to Manage Vaults screen
-                    },
-                  ),
-                  _dashboardCard(
-                    icon: Icons.person,
-                    title: 'Profile',
-                    color: Colors.orange,
-                    onTap: () {
-                      // Add navigation to Profile screen
-                    },
-                  ),
-                  _dashboardCard(
-                    icon: Icons.settings,
-                    title: 'Settings',
-                    color: Colors.purple,
-                    onTap: () {
-                      // Add navigation to Settings screen
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _dashboardCard({
-    required IconData icon,
-    required String title,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 50,
-              color: Colors.white,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+  Widget PasswordTile(passwords password, BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 10, 20.0, 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              LogoBox(password, context),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15.0, 0, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      password.websiteName,
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 22, 22, 22),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      password.email,
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 39, 39, 39),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          SvgPicture.asset("assets/images/copy.svg", height: screenHeight * 0.030),
+        ],
+      ),
+    );
+  }
+
+  Widget LogoBox(passwords password, BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      height: 60,
+      width: 60,
+      decoration: BoxDecoration(
+        color: Constants.logoBackground,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: FractionallySizedBox(
+        heightFactor: 0.5,
+        widthFactor: 0.5,
+        child: Image.network(password.logoUrl),
+      ),
+    );
+  }
+
+  Widget HeadingText(String text) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 0),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget CategoryBoxes() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        CategoryBox(
+            outerColor: Constants.lightBlue,
+            innerColor: Constants.darkBlue,
+            logoAsset: "assets/images/codesandbox.svg"),
+        CategoryBox(
+            outerColor: Constants.lightGreen,
+            innerColor: Constants.darkGreen,
+            logoAsset: "assets/images/compass.svg"),
+        CategoryBox(
+            outerColor: Constants.lightRed,
+            innerColor: Constants.darkRed,
+            logoAsset: "assets/images/creditcard.svg"),
+      ],
+    );
+  }
+
+  Widget profilePicAndBellIcon(String assetName, double screenHeight) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10.0, 35, 20.0, 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              circleAvatarRound(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hello, Rohan",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 22, 22, 22),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      "Good morning",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 39, 39, 39),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          SvgPicture.asset(assetName, height: screenHeight * 0.035),
+        ],
+      ),
+    );
+  }
+
+  Widget circleAvatarRound() {
+    return CircleAvatar(
+      radius: 28,
+      backgroundColor: Color.fromARGB(255, 213, 213, 213),
+      child: CircleAvatar(
+        radius: 26.5,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: CircleAvatar(
+            backgroundImage: AssetImage("assets/images/profilepic.jpg"),
+            radius: 25,
+          ),
         ),
       ),
+    );
+  }
+
+  Widget searchText(String hintText) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: TextFormField(
+        decoration: InputDecoration(
+          prefixIcon: Padding(
+            padding: EdgeInsets.fromLTRB(20, 5, 5, 5),
+            child: Icon(
+              Icons.search,
+              color: Constants.searchGrey,
+            ),
+          ),
+          filled: true,
+          contentPadding: EdgeInsets.all(16),
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: Constants.searchGrey,
+            fontWeight: FontWeight.w500,
+          ),
+          fillColor: Color.fromARGB(247, 232, 235, 237),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(width: 0, style: BorderStyle.none),
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        style: TextStyle(),
+      ),
+    );
+  }
+
+  Future<dynamic> bottomModal(BuildContext context) {
+    return showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext bc) {
+        return Wrap(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(25.0),
+                  topRight: const Radius.circular(25.0),
+                ),
+              ),
+              child: AddModal(),
+            ),
+          ],
+        );
+      },
     );
   }
 }
