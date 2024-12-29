@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safecrypt/screens/sign_up_screen.dart';
+import 'package:safecrypt/screens/dashboard_screen.dart';
 import 'package:safecrypt/widgets/custom_scaffold.dart';
 import '../theme/theme.dart';
 import 'package:safecrypt/custom_page_route.dart';
-import 'package:safecrypt/screens/dashboard_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -14,28 +15,30 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formSignInKey = GlobalKey<FormState>();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+  bool isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
       child: Column(
         children: [
-          // Top Spacer
           const SizedBox(height: 50.0),
-          // App Name and Slogan
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // App Logo or Security Icon
                 Icon(
                   Icons.security,
                   size: 70,
                   color: Colors.white,
                 ),
                 const SizedBox(height: 10),
-                // App Name
                 Text(
                   'SafeCrypt',
                   style: TextStyle(
@@ -45,7 +48,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                // App Slogan
                 Text(
                   'Encrypt. Protect. Secure.',
                   style: TextStyle(
@@ -57,7 +59,6 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
           const SizedBox(height: 30.0),
-          // Main Form Section
           Expanded(
             flex: 7,
             child: Container(
@@ -75,7 +76,6 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Welcome Text
                       Text(
                         'Lets Pick Up Where We Left Off!',
                         style: TextStyle(
@@ -85,16 +85,12 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 40.0),
-                      // Email Field
-                      _buildTextField('Email', 'Enter Email', false),
+                      _buildEmailField(),
                       const SizedBox(height: 25.0),
-                      // Password Field
-                      _buildTextField('Password', 'Enter Password', true),
+                      _buildPasswordField(),
                       const SizedBox(height: 25.0),
-                      // Sign In Button
                       _buildSignInButton(),
                       const SizedBox(height: 30.0),
-                      // Don't have an account? Redirect
                       _buildSignUpRedirect(),
                       const SizedBox(height: 20.0),
                     ],
@@ -108,20 +104,21 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Custom method to build text fields
-  Widget _buildTextField(String label, String hint, bool obscureText) {
+  // Custom method for the Email TextField
+  Widget _buildEmailField() {
     return TextFormField(
-      obscureText: obscureText,
-      obscuringCharacter: '*',
+      controller: _emailController,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter $label';
+          return 'Please enter your email';
+        } else if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value)) {
+          return 'Please enter a valid email address';
         }
         return null;
       },
       decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
+        labelText: 'Email',
+        hintText: 'Enter your email',
         hintStyle: const TextStyle(color: Colors.black26),
         filled: true,
         fillColor: Colors.grey[100],
@@ -140,28 +137,55 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Custom method to build the Sign In button
+  // Custom method for the Password TextField
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: !isPasswordVisible,
+      obscuringCharacter: '*',
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your password';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Enter your password',
+        hintStyle: const TextStyle(color: Colors.black26),
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black12),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: lightColorScheme.primary),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              isPasswordVisible = !isPasswordVisible;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildSignInButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          if (_formSignInKey.currentState!.validate()) {
-            // Show loading or processing message
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Processing Data')),
-            );
-
-            // Simulate some delay for processing (you can replace this with actual authentication logic)
-            Future.delayed(Duration(seconds: 2), () {
-              // Once authentication is successful, navigate to the Dashboard screen
-              Navigator.pushReplacement(
-                context,
-                CustomPageRoute(page: DashboardPage()),
-              );
-            });
-          }
-        },
+        onPressed: _isLoading ? null : _signInUser,
         style: ElevatedButton.styleFrom(
           backgroundColor: lightColorScheme.primary,
           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -169,12 +193,13 @@ class _SignInScreenState extends State<SignInScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text('Sign In', style: TextStyle(fontSize: 16.0)),
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text('Sign In', style: TextStyle(fontSize: 16.0)),
       ),
     );
   }
 
-  // Custom method to build the sign-up redirect
   Widget _buildSignUpRedirect() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -200,5 +225,56 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _signInUser() async {
+    if (_formSignInKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final userCredential = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+        if (userCredential.user != null) {
+          // Navigate to the dashboard page if the user is successfully signed in
+          Navigator.pushReplacement(
+            context,
+            CustomPageRoute(page: DashboardPage()),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String errorMessage;
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found with this email. Please sign up first.';
+          Navigator.push(
+            context,
+            CustomPageRoute(page: SignUpScreen()),
+          );
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Incorrect password. Please try again.';
+        } else {
+          errorMessage = 'An error occurred. Please try again later.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      } catch (e) {
+        // Catch any other errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An unexpected error occurred. Please try again.')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      // If form is invalid, show a general validation error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter valid email and password.')),
+      );
+    }
   }
 }

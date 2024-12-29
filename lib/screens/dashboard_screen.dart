@@ -12,7 +12,6 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     const String assetName = 'assets/images/bell.svg';
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
 
     return SafeArea(
       child: Scaffold(
@@ -114,8 +113,8 @@ class DashboardPage extends StatelessWidget {
   }
 
   Widget LogoBox(passwords password, BuildContext context) {
+    // ignore: unused_local_variable
     double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       height: 60,
       width: 60,
@@ -176,7 +175,7 @@ class DashboardPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hello, Rohan",
+                      "Hello, Muhammad Humayun Amar",
                       style: TextStyle(
                         color: Color.fromARGB(255, 22, 22, 22),
                         fontSize: 17,

@@ -129,7 +129,6 @@ class AddModal extends StatelessWidget {
   }
 
   Widget websiteContainer(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Row(
       children: [

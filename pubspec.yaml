@@ -34,6 +34,7 @@ dependencies:
   flutter_animated_splash: ^0.0.10
   firebase_database: ^11.2.0
 
+  flutter_svg: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,7 +62,7 @@ flutter:
     - assets/images/codesandbox.svg
     - assets/images/compass.svg
     - assets/images/copy.svg
-    - assets/images//creditcard.svg
+    - assets/images/creditcard.svg
     - assets/images/profilepic.jpg
     - assets/images/shield.svg
 

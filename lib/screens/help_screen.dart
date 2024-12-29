@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:safecrypt/colors/colors.dart';
-import 'package:safecrypt/screens/sign_in_screen.dart'; // Direct import without alias
+// Direct import without alias
 import 'package:safecrypt/screens/sign_up_screen.dart';
 import 'package:safecrypt/widgets/custom_scaffold.dart';
 

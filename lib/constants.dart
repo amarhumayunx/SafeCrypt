@@ -21,7 +21,7 @@ class Constants {
 
   static List<passwords> passwordData = [
     passwords("Google Account", "rahulornob@gmail.com",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2008px-Google_%22G%22_Logo.svg.png"),
+        "https://e7.pngegg.com/pngimages/543/934/png-clipart-google-app-logo-google-logo-g-suite-google-text-logo.png"),
     passwords("Netflix Personal", "rahulornob@gmail.com",
         "https://pngimg.com/uploads/netflix/netflix_PNG15.png"),
     passwords("Twitter", "rahulornob",

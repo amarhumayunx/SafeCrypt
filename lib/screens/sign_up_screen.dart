@@ -19,6 +19,7 @@ final databaseReference = FirebaseDatabase.instance.ref("Users");
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formSignupKey = GlobalKey<FormState>();
   bool agreePersonalData = true;
+  bool isPasswordVisible = false;
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -30,24 +31,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return CustomScaffold(
       child: Column(
         children: [
-          // Top Spacer
-          const SizedBox(
-            height: 50.0,
-          ),
-          // App Name and Slogan
+          const SizedBox(height: 50.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // App Logo or Security Icon
-                Icon(
-                  Icons.security,
-                  size: 70,
-                  color: Colors.white,
-                ),
+                Icon(Icons.security, size: 70, color: Colors.white),
                 const SizedBox(height: 10),
-                // App Name
                 Text(
                   'SafeCrypt',
                   style: TextStyle(
@@ -57,7 +48,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                // App Slogan
                 Text(
                   'Encrypt. Protect. Secure.',
                   style: TextStyle(
@@ -69,7 +59,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
           const SizedBox(height: 30.0),
-          // Main Form Section
           Expanded(
             flex: 7,
             child: Container(
@@ -87,7 +76,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Get Started Text
                       Text(
                         'Begin Your Journey to Digital Security!',
                         style: TextStyle(
@@ -97,25 +85,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       const SizedBox(height: 40.0),
-                      // Full Name Field
                       _buildTextField('Full Name', 'Enter Full Name', false, fullNameController),
                       const SizedBox(height: 25.0),
-                      // Email Field
-                      _buildTextField('Email', 'Enter Email', false, emailController),
+                      _buildEmailField(),
                       const SizedBox(height: 25.0),
-                      // Password Field
-                      _buildTextField('Password', 'Enter Password', true, passwordController),
+                      _buildPasswordField(),
                       const SizedBox(height: 25.0),
-                      // I Agree Checkbox
                       _buildAgreeCheckbox(),
                       const SizedBox(height: 25.0),
-                      // Sign Up Button
                       _buildSignUpButton(),
                       const SizedBox(height: 30.0),
-                      // Already Have Account Text
                       _buildSignInRedirect(),
                       const SizedBox(height: 20.0),
-                      // Help and Support Link
                       _buildHelpAndSupportLink(),
                     ],
                   ),
@@ -128,15 +109,88 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: emailController,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        }
+        final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+        if (!emailRegex.hasMatch(value)) {
+          return 'Please enter a valid email';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: 'Email',
+        hintText: 'Enter Email',
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: passwordController,
+      obscureText: !isPasswordVisible, // Toggle based on state
+      obscuringCharacter: '*',
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a password';
+        }
+        if (value.length < 8) {
+          return 'Password must be at least 8 characters long';
+        }
+        final passwordRegex =
+        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+        if (!passwordRegex.hasMatch(value)) {
+          return 'Password must include uppercase, lowercase, number, and special character';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Enter Password',
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              isPasswordVisible = !isPasswordVisible; // Toggle visibility
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   // Custom method to build text fields
-  Widget _buildTextField(String label, String hint, bool obscureText, TextEditingController controller) {
+  Widget _buildTextField(String label, String hint, bool isPasswordField, TextEditingController controller) {
     return TextFormField(
       controller: controller,
-      obscureText: obscureText,
+      obscureText: isPasswordField ? !isPasswordVisible : false, // Handle visibility toggle
       obscuringCharacter: '*',
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter $label';
+        }
+        if (label == "Email" && !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+          return 'Please enter a valid email address';
+        }
+        if (label == "Password" && value.length < 8) {
+          return 'Password must be at least 8 characters long';
         }
         return null;
       },
@@ -154,7 +208,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: lightColorScheme.primary),
+          borderSide: BorderSide(color: Colors.blueAccent),
           borderRadius: BorderRadius.circular(10),
         ),
       ),

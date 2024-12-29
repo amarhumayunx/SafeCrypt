@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safecrypt/screens/sign_up_screen.dart';
 import 'package:safecrypt/screens/sign_in_screen.dart';
-import 'package:safecrypt/colors/colors.dart';
-import 'package:safecrypt/custom_page_route.dart';
+import 'package:safecrypt/screens/dashboard_screen.dart'; // Import the Dashboard screen
 import 'package:safecrypt/theme/theme.dart';
 import 'package:safecrypt/widgets/custom_scaffold.dart';
 import 'package:safecrypt/widgets/welcome_button.dart';
@@ -12,6 +12,19 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the user is already signed in
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    // If a user is signed in, navigate to the Dashboard screen immediately
+    if (auth.currentUser != null) {
+      Future.delayed(Duration.zero, () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
+        );
+      });
+    }
+
     return CustomScaffold(
       child: Column(
         children: [
@@ -98,7 +111,12 @@ class WelcomeScreen extends StatelessWidget {
                   Expanded(
                     child: WelcomeButton(
                       buttonText: 'Sign In',
-                      onTap: SignInScreen(),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignInScreen()),
+                        );
+                      },
                       color: Colors.transparent,
                       textColor: Colors.white,
                     ),
@@ -107,7 +125,12 @@ class WelcomeScreen extends StatelessWidget {
                   Expanded(
                     child: WelcomeButton(
                       buttonText: 'Sign Up',
-                      onTap: const SignUpScreen(),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                        );
+                      },
                       color: Colors.white,
                       textColor: lightColorScheme.primary,
                       alignment: Alignment.center,
