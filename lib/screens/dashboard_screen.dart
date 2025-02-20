@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:safecrypt/password_model.dart';
 import 'package:safecrypt/constants.dart';
 import 'package:safecrypt/category_container.dart';
-import '../add_model.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -267,7 +266,6 @@ class DashboardPage extends StatelessWidget {
                   topRight: const Radius.circular(25.0),
                 ),
               ),
-              child: AddModal(),
             ),
           ],
         );
