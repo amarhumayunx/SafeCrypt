@@ -1,0 +1,2 @@
+C:/Users/amarh/Downloads/SafeCrypt/SafeCrypt-master/android/app/.cxx/Debug/2w25i41j/x86/CMakeFiles/edit_cache.dir
+C:/Users/amarh/Downloads/SafeCrypt/SafeCrypt-master/android/app/.cxx/Debug/2w25i41j/x86/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+C:/Users/amarh/Downloads/SafeCrypt/SafeCrypt-master/android/app/.cxx/RelWithDebInfo/5p2d2s4m/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/amarh/Downloads/SafeCrypt/SafeCrypt-master/android/app/.cxx/RelWithDebInfo/5p2d2s4m/armeabi-v7a/CMakeFiles/rebuild_cache.dir
