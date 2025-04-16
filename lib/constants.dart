@@ -30,5 +30,5 @@ class Constants {
         "https://cdn.freebiesupply.com/logos/large/2x/dribbble-icon-1-logo-png-transparent.png"),
   ];
 
-  static List<String> websiteList = ["twitter", "facebook", "Instagram"];
+
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:safecrypt/add_model.dart';
 import 'package:safecrypt/password_model.dart';
 import 'package:safecrypt/constants.dart';
 import 'package:safecrypt/category_container.dart';
@@ -18,7 +19,7 @@ class DashboardPage extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () => bottomModal(context),
           backgroundColor: Constants.fabBackground,
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
         ),
         bottomNavigationBar: BottomAppBar(
           shape: const CircularNotchedRectangle(),
@@ -28,9 +29,21 @@ class DashboardPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SvgPicture.asset("assets/images/4square.svg"),
-                SizedBox(width: 10),
-                SvgPicture.asset("assets/images/shield.svg"),
+                GestureDetector(
+                  onTap: () {
+                    print("Categories Clicked");
+                    // TODO: Navigate to categories screen
+                  },
+                  child: SvgPicture.asset("assets/images/4square.svg"),
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    print("Shield Clicked");
+                    // TODO: Navigate to security settings screen
+                  },
+                  child: SvgPicture.asset("assets/images/shield.svg"),
+                ),
               ],
             ),
           ),
@@ -42,24 +55,35 @@ class DashboardPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 profilePicAndBellIcon(assetName, screenHeight),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 searchText("Search Password"),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 HeadingText("Category"),
-                SizedBox(height: 10),
-                CategoryBoxes(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    print("Category Clicked");
+                    // TODO: Implement category navigation
+                  },
+                  child: CategoryBoxes(),
+                ),
+                const SizedBox(height: 10),
                 HeadingText("Recently Used"),
-                SizedBox(height: 10),
-                Container(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: Constants.passwordData.length,
-                    itemBuilder: (context, index) {
-                      final password = Constants.passwordData[index];
-                      return PasswordTile(password, context);
-                    },
-                  ),
+                const SizedBox(height: 10),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: Constants.passwordData.length,
+                  itemBuilder: (context, index) {
+                    final password = Constants.passwordData[index];
+                    return GestureDetector(
+                      onTap: () {
+                        print("Password Clicked: ${password.websiteName}");
+                        // TODO: Navigate to password details screen
+                      },
+                      child: PasswordTile(password, context),
+                    );
+                  },
                 ),
               ],
             ),
@@ -174,7 +198,7 @@ class DashboardPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hello, Muhammad Humayun Amar",
+                      "Hello, Muhammad Humayun",
                       style: TextStyle(
                         color: Color.fromARGB(255, 22, 22, 22),
                         fontSize: 17,
@@ -250,26 +274,85 @@ class DashboardPage extends StatelessWidget {
 
   Future<dynamic> bottomModal(BuildContext context) {
     return showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext bc) {
-        return Wrap(
-          children: <Widget>[
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext bc) {
+          return Wrap(children: <Widget>[
             Container(
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors
+                        .white, //forDialog ? Color(0xFF737373) : Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(25.0),
+                        topRight: const Radius.circular(25.0))),
+                child: AddModal(),
+              ),
+            )
+          ]);
+        });
+  }
+
+  Widget bottomSheetWidgets(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10.0, 10, 10, 10),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 10,
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: screenWidth * 0.4,
+              height: 5,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(25.0),
-                  topRight: const Radius.circular(25.0),
+                  color: Color.fromARGB(255, 156, 156, 156),
+                  borderRadius: BorderRadius.circular(20)),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          searchText("Search for a website or app"),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: [
+              Container(
+                height: 60,
+                width: 130,
+                decoration: BoxDecoration(
+                    color: Constants.logoBackground,
+                    borderRadius: BorderRadius.circular(20)),
+                child: FractionallySizedBox(
+                  heightFactor: 0.5,
+                  widthFactor: 0.5,
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Icon(Icons.add),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          "Add",
+                          style: TextStyle(fontSize: 14),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

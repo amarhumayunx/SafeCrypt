@@ -7,9 +7,9 @@ class CategoryBox extends StatelessWidget {
   final String logoAsset;
   const CategoryBox(
       {super.key,
-        required this.outerColor,
-        required this.innerColor,
-        required this.logoAsset});
+      required this.outerColor,
+      required this.innerColor,
+      required this.logoAsset});
 
   @override
   Widget build(BuildContext context) {

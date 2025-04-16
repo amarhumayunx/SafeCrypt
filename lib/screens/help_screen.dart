@@ -6,6 +6,8 @@ import 'package:safecrypt/widgets/custom_scaffold.dart';
 import '../theme/theme.dart'; // Assuming CustomScaffold exists
 
 class HelpScreen extends StatelessWidget {
+  const HelpScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -188,7 +190,6 @@ class HelpScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Return to Home', style: TextStyle(fontSize: 18)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: lightColorScheme.primary,
                           foregroundColor: Colors.white,
@@ -196,6 +197,7 @@ class HelpScreen extends StatelessWidget {
                           textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
+                        child: const Text('Return to Home', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ],

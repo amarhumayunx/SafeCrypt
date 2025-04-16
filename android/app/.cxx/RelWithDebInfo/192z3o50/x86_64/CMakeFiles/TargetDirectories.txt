@@ -1,0 +1,2 @@
+C:/Users/amarh/Downloads/SafeCrypt/android/app/.cxx/RelWithDebInfo/192z3o50/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/amarh/Downloads/SafeCrypt/android/app/.cxx/RelWithDebInfo/192z3o50/x86_64/CMakeFiles/rebuild_cache.dir
