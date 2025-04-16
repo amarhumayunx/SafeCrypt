@@ -297,6 +297,7 @@ class DashboardPage extends StatelessWidget {
   }
 
   Widget bottomSheetWidgets(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10.0, 10, 10, 10),
